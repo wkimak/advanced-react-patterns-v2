@@ -8,20 +8,16 @@ import React from 'react'
 class Toggle extends React.Component {
   // 🐨 this toggle component is going to need to have state for `on`
 
-  //
-  constructor(props) {
-    super(props);
-
-    this.state = { on: false }
-    this.handleSwitch = this.handleSwitch.bind(this);
-  }
-
+  state = { on: false }
+   
   // You'll also want a method to handle when the switch is clicked
   // which will update the `on` state and call the `onToggle` prop
   // with the new `on` state.
 
-  handleSwitch() {
-    this.setState({ on: !this.state.on }, () => {
+  handleSwitch = () => {
+    this.setState( currentState => {
+      return { on: !currentState.on }
+    }, () => {
       this.props.onToggle(this.state.on);
     })
   }
