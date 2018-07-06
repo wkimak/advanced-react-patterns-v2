@@ -40,7 +40,10 @@ import {Switch} from '../switch'
 //   (newlines are ok, like in the above example)
 
 // 🐨 create a ToggleContext with React.createContext here
-const Context = React.createContext(null);
+const {Provider, Consumer} = React.createContext({
+  on: false,
+  toggle: () => {}
+});
 
 class Toggle extends React.Component {
   // 🐨 each of these compound components will need to be changed to use
@@ -48,41 +51,42 @@ class Toggle extends React.Component {
   // from props, it'll get it from the ToggleContext.Consumer value.
  
   static On = ({ children }) => (
-    <Context.Consumer>
-    {(val) => val.state.on ? children : null}
-    </Context.Consumer>  
+    <Consumer>
+    {(val) => val.on ? children : null}
+    </Consumer>  
   );
 
   static Off = ({ children }) => (
-    <Context.Consumer>
-    {(val) => val.state.on ? null : children}
-    </Context.Consumer>
+    <Consumer>
+    {(val) => val.on ? null : children}
+    </Consumer>
   );
 
-  static Button = (...props) => (
-    <Context.Consumer>
-    {(val) => <Switch on={val.state.on} onClick={val.toggle} />}
-    </Context.Consumer>
+  static Button = (props) => (
+    <Consumer>
+    {(val) => <Switch on={val.on} onClick={val.toggle} {...props} />}
+    </Consumer>
   );
 
 
-  state = {on: false}
+
   toggle = () =>
     this.setState(
       ({on}) => ({on: !on}),
       () => this.props.onToggle(this.state.on),
     )
+
+    state = {on: false, toggle: this.toggle}
   render() {
     // Because this.props.children is _immediate_ children only, we need
     // to 🐨 remove this map function and render our context provider with
     // this.props.children as the children of the provider. Then we'll
     // expose the `on` state and `toggle` method as properties in the context
     // value (the value prop).
-
     return (
-      <Context.Provider value={{state: this.state, toggle: this.toggle}}>
+      <Provider value={this.state}>
         {this.props.children}
-      </Context.Provider>
+      </Provider>
     )
   }
 }
